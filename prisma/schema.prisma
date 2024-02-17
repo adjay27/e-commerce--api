@@ -19,8 +19,9 @@ model Products {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  category Categories @relation(fields: [category_id], references: [id])
-  Carts    Carts[]
+  category  Categories  @relation(fields: [category_id], references: [id])
+  Carts     Carts[]
+  OrderItem OrderItem[]
 
   @@map("products")
 }
@@ -41,6 +42,7 @@ model Carts {
   user_id    Int
   product_id Int
   quantity   Int
+  total      Float    @default(0)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -50,12 +52,37 @@ model Carts {
   @@map("carts")
 }
 
-model Orders {
+model OrderItem {
   id         Int      @id @default(autoincrement())
-  total      Int
-  status     String   @default("pending")
-  created_at DateTime @default(now())
+  order_id   Int
+  product_id Int
+  quantity   Int      @default(1)
+  price      Float    @default(0) @db.Float
+  total      Float    @default(0) @db.Float
+  created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @updatedAt
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_1")
+  product    Products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_2")
+
+  @@index([order_id], map: "order_id")
+  @@index([product_id], map: "product_id")
+  @@map("order_items")
+}
+
+enum Status {
+  PAID
+  PENDING
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  date           DateTime    @default(now()) @db.DateTime(0)
+  number         String      @db.VarChar(255)
+  total          Float       @default(0) @db.Float
+  payment_status Status      @default(PENDING)
+  created_at     DateTime    @default(now()) @db.Timestamp(0)
+  updated_at     DateTime    @default(now()) @db.Timestamp(0)
+  order_items    OrderItem[]
 
   @@map("orders")
 }

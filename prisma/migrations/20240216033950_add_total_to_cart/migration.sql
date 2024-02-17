@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `carts` ADD COLUMN `total` DOUBLE NOT NULL DEFAULT 0;

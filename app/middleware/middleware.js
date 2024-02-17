@@ -8,14 +8,17 @@ export const authorizePermission = (permission) => {
           message: "Unauthorized",
         });
       }
+      req.user = verify;
       const permissionRecord = await prisma.permissionRole.findMany({
         where: { role_id: verify.id },
-        include: { permission: true },
+        include: { permission : true },
       });
+      
   
       const permissions = permissionRecord.map(
         (record) => record.permission.name
       );
+      console.log(permissions);
       if (!permissions.includes(permission)) {
         return res.status(403).json({
           message: `You don't have the required permission to perform this action`,

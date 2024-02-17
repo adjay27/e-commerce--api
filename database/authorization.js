@@ -37,6 +37,10 @@ export const Permission = {
 
 export const PermissionAssignment = {
   [Role.SELLER]: [
+    Permission.BROWSE_USERS,
+    Permission.READ_USER,
+   
+
     Permission.BROWSE_PRODUCTS,
     Permission.READ_PRODUCT,
     Permission.EDIT_PRODUCT,
@@ -63,8 +67,11 @@ export const PermissionAssignment = {
   ],
 
   [Role.REGULAR_USER]: [
+    Permission.EDIT_USER,
+
     Permission.BROWSE_PRODUCTS,
     Permission.READ_PRODUCT,
+
 
     Permission.BROWSE_CATEGORIES,
     Permission.READ_CATEGORY,

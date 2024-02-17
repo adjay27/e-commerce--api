@@ -1,59 +1,20 @@
 import { Router } from "express";
 import prisma from "../prisma.js";
-import { newProduct } from "../services/productServices.js";
 import { authorizePermission } from "../middleware/middleware.js";
 import { Permission } from "../../database/authorization.js";
+import productController from "../controller/product.js";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
-  const products = await prisma.products.findMany();
-  res.json(products);
-});
+router.get("/", productController.getAllProduct);
 
-router.get(
-  "/test",
-  authorizePermission(Permission.BROWSE_PRODUCTS),
-  async (req, res) => {
-    const products = await prisma.products.findMany();
-    res.json(products);
-  }
-);
+router.get("/:id", productController.getProduct);
+router.get("/search", productController.searchProduct);
 
-router.get("/:id", async (req, res) => {
-  const product = await prisma.products.findFirst({
-    where: {
-      id: Number(req.params.id),
-    },
-  });
+router.post("/add", authorizePermission(Permission.ADD_PRODUCT), productController.addProduct);
 
-  res.json(product);
-});
+router.put("/edit/:id", authorizePermission(Permission.EDIT_PRODUCT), productController.editProduct);
 
-router.get("/:params", async (req, res) => {
-  const product = await prisma.products.findMany({
-    where: {
-      name: req.params.params,
-    },
-  });
-  res.json(product);
-});
+router.delete("/delete/:id", authorizePermission(Permission.DELETE_PRODUCT), productController.deleteProduct);
 
-router.post(
-  "/add",
-  authorizePermission(Permission.ADD_PRODUCT),
-  async (req, res) => {
-    const product = await prisma.products.create({
-      data: {
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        category_id: req.body.category_id,
-      },
-    });
-    res.json({
-      message: "product added successfully!",
-    });
-  }
-);
 export default router;

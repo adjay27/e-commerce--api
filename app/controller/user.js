@@ -22,7 +22,7 @@ const userController = {
       const token = req.headers.authorization;
       const validToken = verifyToken(token);    
       req.user = validToken;
-      const results = await User.find(Number(req.user.id));
+      const results = await User.findUser(Number(req.user.id));
       console.log(results);
       res.json(results);
     } catch (error) {

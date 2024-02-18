@@ -22,6 +22,24 @@ class User extends Service {
       }
     });
   }
+
+  async findUser(id) {
+    return await this.prisma[this.model].findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role_id: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        is_blocked: true,
+      }
+    });
+  }
   
   async login(data) {
     const user = await this.prisma[this.model].findUnique({

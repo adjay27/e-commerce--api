@@ -53,19 +53,18 @@ model Carts {
 }
 
 model OrderItem {
-  id         Int      @id @default(autoincrement())
-  order_id   Int
-  product_id Int
-  quantity   Int      @default(1)
-  price      Float    @default(0) @db.Float
-  total      Float    @default(0) @db.Float
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @updatedAt
-  order      Order    @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_1")
-  product    Products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_2")
+  order_id    Int
+  product_id  Int
+  quantity    Int
+  price       Float
+  total_price Float
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  @@index([order_id], map: "order_id")
-  @@index([product_id], map: "product_id")
+  Product Products @relation(fields: [product_id], references: [id])
+  Order   Order    @relation(fields: [order_id], references: [id])
+
+  @@id([order_id, product_id])
   @@map("order_items")
 }
 
@@ -75,14 +74,17 @@ enum Status {
 }
 
 model Order {
-  id             Int         @id @default(autoincrement())
-  date           DateTime    @default(now()) @db.DateTime(0)
-  number         String      @db.VarChar(255)
-  total          Float       @default(0) @db.Float
-  payment_status Status      @default(PENDING)
-  created_at     DateTime    @default(now()) @db.Timestamp(0)
-  updated_at     DateTime    @default(now()) @db.Timestamp(0)
-  order_items    OrderItem[]
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  date           DateTime @default(now()) @db.DateTime(0)
+  number         String   @db.VarChar(255)
+  payment_status Status   @default(PENDING)
+  total          Float
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  Order_Items OrderItem[]
+  User        Users       @relation(fields: [user_id], references: [id])
 
   @@map("orders")
 }
@@ -97,9 +99,10 @@ model Users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  token Token[]
-  role  Role    @relation(fields: [role_id], references: [id])
-  cart  Carts[]
+  token  Token[]
+  role   Role    @relation(fields: [role_id], references: [id])
+  cart   Carts[]
+  Orders Order[]
 
   @@map("users")
 }

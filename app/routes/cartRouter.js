@@ -18,20 +18,6 @@ router.post(
   cartController.addToCart
 );
 
-router.delete(
-  "/:id",
-  authorizePermission(Permission.DELETE_CART),
-  async (req, res) => {
-    const deleteCart = await prisma.carts.delete({
-      where: {
-        id: Number(req.params.id),
-      },
-    });
-    res.json({
-      message: "Delete product from cart successfuly!",
-      deleteCart,
-    });
-  }
-);
+router.delete('/', authorizePermission(Permission.DELETE_CART), cartController.deleteCart);
 
 export default router;

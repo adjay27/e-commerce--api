@@ -26,6 +26,13 @@ const cartController = {
       return;
     }
   },
+
+  deleteCart: async (req, res) => {
+    const user_id = req.user.id;
+    const product_id = req.body.product_id;
+    const results = await Cart.delete(product_id, user_id);
+    res.json(results);
+  },
 };
 
 export default cartController;

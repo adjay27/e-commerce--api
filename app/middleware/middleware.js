@@ -18,7 +18,7 @@ export const authorizePermission = (permission) => {
       const permissions = permissionRecord.map(
         (record) => record.permission.name
       );
-      console.log(permissions);
+      
       if (!permissions.includes(permission)) {
         return res.status(403).json({
           message: `You don't have the required permission to perform this action`,

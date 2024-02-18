@@ -1,16 +1,13 @@
 import Order from "../services/orderServices.js";
 
 const orderController = {
-
   orderByUser: async (req, res) => {
     try {
-      const user_id = req.user.id;
-      console.log(user_id);
-      const orders = await Order.findByUser(user_id);
-      console.log(orders);
+      const orders = await Order.findByUser(req.user.id);
       res.json(orders);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      console.log(err);
+      res.status(500).json({ err });
     }
   },
 

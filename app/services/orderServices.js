@@ -6,10 +6,10 @@ import axios from "axios";
 class Order extends Service {
   model = Prisma.ModelName.Order;
 
-  async checkout() {
-    const cart = await Cart.cartUser();
+  async checkout(product_id, user_id) {
+    const cartUser = await Cart.cartUser(user_id);
 
-    if (cart.carts.length === 0) {
+    if (cartUser.carts.length === 0) {
       throw new Error("Cart is empty");
     }
 
@@ -18,74 +18,98 @@ class Order extends Service {
         data: {
           date: new Date(),
           number: `ORD/${Math.floor(Math.random() * 1000)}`,
-          total: cart.total,
+          total: cartUser.total,
+          payment_status: "PENDING",
+          user_id,
         },
       });
 
       await transaction.orderItem.createMany({
-        data: cart.carts.map((product) => {
+        data: cartUser.carts.map((product) => {
           return {
             order_id: order.id,
             product_id: product.product_id,
             quantity: product.quantity,
-            price: product.price,
-            total: product.total,
+            price: product.product.price,
+            total_price: product.total,
           };
         }),
       });
 
-      await Cart.empty();
+      await transaction.carts.deleteMany({
+        where: {
+          user_id,
+          product_id: {
+            in: product_id,
+          },
+        },
+      });
+
+      return {
+        success: true,
+        order,
+      };
     });
   }
 
   async findByUser(id) {
-    return await this.prisma.order.findMany({
+    return await this.prisma[this.model].findMany({
       where: {
         user_id: Number(id),
-      }
-    })
+      },
+      select: {
+        id: true,
+        number: true,
+        date: true,
+        total: true,
+        payment_status: true,
+      },
+    });
   }
 
   async pay(order_id, data) {
     return await this.prisma.$transaction(async (transaction) => {
       const order = await transaction.order.findUnique({
-        where: { id: Number(order_id) },
+        where: {
+          id: Number(order_id)
+        },
       });
 
       if (!order) {
         throw new Error("Order not found");
       }
+      console.log(order);
 
       try {
-        const response = await axios.post("http://localhost:3000/pay", {
+        const response = await axios.post('http://localhost:3000/pay', {
           amount: order.total,
           cardNumber: data.cardNumber,
           cvv: data.cvv,
           expiryMonth: data.expiryMonth,
           expiryYear: data.expiryYear,
         });
-        if (response.data === "200") {
+        console.log(response);
+        if (response.status === 200) {
           await transaction.order.update({
             where: { id: Number(order_id) },
             data: {
-              payment_status: PaymentStatus.PAID,
+              payment_status: "PAID",
             },
-          });
+          });          
 
           const newOrder = await transaction.order.findUnique({
-            where: { id: Number(order_id) },
+            where: { id: order_id },
           });
 
           return {
             success: true,
-            order: newOrder,
             message: "Payment success",
+            order: newOrder,
           };
         } else {
           throw new Error("Payment failed");
         }
-      } 
-      catch (err) {
+      } catch (err) {
         throw new Error("Payment failed");
       }
     });

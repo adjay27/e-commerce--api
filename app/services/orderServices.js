@@ -78,7 +78,6 @@ class Order extends Service {
       if (!order) {
         throw new Error("Order not found");
       }
-      console.log(order);
 
       try {
         const response = await axios.post('http://localhost:3000/pay', {
@@ -88,7 +87,6 @@ class Order extends Service {
           expiryMonth: data.expiryMonth,
           expiryYear: data.expiryYear,
         });
-        console.log(response);
         if (response.status === 200) {
           await transaction.order.update({
             where: { id: Number(order_id) },

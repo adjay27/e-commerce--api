@@ -23,7 +23,6 @@ const userController = {
       const validToken = verifyToken(token);    
       req.user = validToken;
       const results = await User.findUser(Number(req.user.id));
-      console.log(results);
       res.json(results);
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });

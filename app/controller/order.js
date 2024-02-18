@@ -6,7 +6,6 @@ const orderController = {
       const orders = await Order.findByUser(req.user.id);
       res.json(orders);
     } catch (err) {
-      console.log(err);
       res.status(500).json({ err });
     }
   },
@@ -14,7 +13,6 @@ const orderController = {
   checkout: async (req, res) => {
     try {
       const user_id = req.user.id;
-      console.log(user_id);
       const product_id = req.body.product_id;
       const checkout = await Order.checkout(product_id, user_id);
       res.json(checkout);

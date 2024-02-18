@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const encrypt = (data, hex) => {
-  console.log(data);
   const iv = Buffer.from(process.env.CRYPTO_IV, "hex");
   const key = Buffer.from(hex, "hex");
   const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);

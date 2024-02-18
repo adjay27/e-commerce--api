@@ -51,7 +51,7 @@ Example of response success generating token
 
 ## Endpoints
 
-#### User
+### User Routes
 
 Register User
 
@@ -74,6 +74,7 @@ Retrieve User Profile
 ```
 GET /user/info
 ```
+
 Retrieve the profile information of a user by their ID inside token.
 
 Response body user info
@@ -90,21 +91,190 @@ Response body user info
   "is_blocked": false
 }
 ```
+
+Retrieve All User in database
+
+```bash
+GET /user/all
+```
+
+This endpoint can accessible only for account with `role_id : 1` / Seller
+
 Update User Profile
+
 ```bash
 PUT /user/edit:id
 ```
-Update the profile information of a user. 
+
+Example request body edit user profile
+
+```json
+{
+  "name": "anjayAfterEdit",
+  "email": "aditya1@gmail.com",
+  "password": "password"
+}
+```
+
+Update the profile information of a user.
+
+Delete User Profile
+
+```bash
+DELETE /user/delete:id
+```
+
+response body
+
+```json
+{
+  "message": "User Deleted Successfully",
+  "results": {
+    "id": 6,
+    "name": "anjayAfterEdit",
+    "email": "aditya1@gmail.com",
+    "password": "password",
+    "is_blocked": false,
+    "role_id": 2,
+    "created_at": "2024-02-18T07:20:59.452Z",
+    "updated_at": "2024-02-18T07:24:50.319Z"
+  }
+}
+```
+
 ### Products Routes
 
 ```bash
-GET /api/products
+GET /products
 ```
 
 Retrieve all products
 
 ```bash
-GET /api/products/{id}
+GET /products/:id
 ```
 
 Retrieve a product by id
+
+Add a product
+
+```bash
+POST /products/add
+```
+
+Edit a product
+
+```bash
+PUT /products/edit/:id
+```
+
+Example request body add a product. Can also be used for edit request body edit product
+
+```json
+{
+  "name": "Nothing",
+  "description": "its nothing just nothing",
+  "price": 100,
+  "category_id": 1
+}
+```
+
+Delete a product
+
+```bash
+DELETE /products/delete/:id
+```
+
+Delete a product by their ID
+
+### Cart Routes
+
+Retrieve a cart per user based on token headers
+
+```bash
+GET /cart
+```
+
+Add product to cart
+
+```bash
+POST /cart/add
+```
+
+Example body request adding product to cart
+
+```json
+{
+  "product_id": 2,
+  "quantity": 1
+}
+```
+
+Delete cart
+
+```bash
+DELETE /cart
+```
+
+Delete any product inside a cart
+
+### Order Routes
+
+Retrieve Order
+
+```bash
+GET /order
+```
+
+Retrieve order record from database
+
+Create order
+
+```bash
+POST /order
+```
+
+Checkout all product inside the cart. Cart must not empty
+
+### Payment
+
+Simulate payment process
+
+```bash
+POST /payment/pay
+```
+
+example of body request
+
+```json
+{
+  "order_id": 1,
+  "cardNumber": "4012888888881881",
+  "cvv": 201,
+  "expiryMonth": "02",
+  "expiryYear": "2024"
+}
+```
+
+example success response payment
+
+```json
+{
+  "success": true,
+  "message": "Payment success",
+  "order": {
+    "id": 1,
+    "user_id": 4,
+    "date": "2024-02-18T07:34:53.000Z",
+    "number": "ORD/176",
+    "payment_status": "PAID",
+    "total": 1499.99,
+    "created_at": "2024-02-18T07:34:52.772Z",
+    "updated_at": "2024-02-18T14:45:33.581Z"
+  }
+}
+```
+
+
+
+

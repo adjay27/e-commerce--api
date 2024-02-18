@@ -6,6 +6,22 @@ import bcrypt from "bcrypt";
 class User extends Service {
   model = Prisma.ModelName.Users;
 
+  async getAllUsers() {
+    return await this.prisma[this.model].findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role_id: true,
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        is_blocked: true,
+      }
+    });
+  }
   
   async login(data) {
     const user = await this.prisma[this.model].findUnique({
